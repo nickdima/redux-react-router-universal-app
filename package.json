@@ -1,7 +1,7 @@
 {
   "name": "redux-react-router-server",
   "version": "1.0.0",
-  "description": "A simple example for doing data fethcing and server side rendering with React Router and Redux",
+  "description": "A simple example for doing data fetching and server side rendering with React Router and Redux",
   "main": "index.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
