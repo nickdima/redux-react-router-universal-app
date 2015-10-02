@@ -33,14 +33,11 @@ seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/ro
 - collecting all actions, dispatching them and waiting for all of them to settle before rendering the matched route server side, as seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/index.coffee#L21):
 
 ```coffee
-dispatchActions = ({routes, params}) ->
-  Promise.all routes.filter(hasAction).map (route) ->
-    store.dispatch route.action.call(this, params)
+promises = renderProps.routes.filter(hasAction).map (route) ->
+  action = route.action.call(this, renderProps.params)
+  store.dispatch(action)
 
-...
-
-dispatchActions(renderProps)
-.then (data) ->
+Promise.all(promises).then (data) ->
   element = React.createElement(RoutingContext, renderProps)
   html = renderToString(element)
   res.send(html)
