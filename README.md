@@ -30,7 +30,7 @@ seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/ro
 </Route>
 ```
 
-- collecting all actions, dispatching them and waiting for all of them to settle before rendering the matched route server side, as seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/index.coffee#L21):
+- collecting all actions, dispatching them and waiting for all of them to settle before rendering the matched route server side, as seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/index.coffee#L23):
 
 ```coffee
 promises = renderProps.routes.filter(hasAction).map (route) ->
@@ -38,7 +38,8 @@ promises = renderProps.routes.filter(hasAction).map (route) ->
   store.dispatch(action)
 
 Promise.all(promises).then (data) ->
-  element = React.createElement(RoutingContext, renderProps)
+  props = assign {}, renderProps, {store}
+  element = React.createElement(RoutingContext, props)
   html = renderToString(element)
   res.send(html)
 ```

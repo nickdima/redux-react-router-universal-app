@@ -5,7 +5,7 @@
   "main": "index.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.coffee"
+    "start": "nodemon index.coffee -e coffee,cjsx"
   },
   "author": "Nick Dima",
   "license": "MIT",

@@ -5,10 +5,11 @@ React = require 'react'
 { renderToString } = require 'react-dom/server'
 { match } = require 'react-router'
 Promise = require 'bluebird'
+assign = require 'object-assign'
 
 RoutingContext = require './routing-context'
 routes = require './routes'
-store = require './store'
+{createStore} = require './store'
 
 app = express()
 
@@ -18,12 +19,14 @@ app.get '*', (req, res) ->
   location = createLocation(req.url)
   match { routes, location }, (error, redirectLocation, renderProps) ->
     # no error handling implemented
+    store = createStore()
     promises = renderProps.routes.filter(hasAction).map (route) ->
       action = route.action.call(this, renderProps.params)
       store.dispatch(action)
 
     Promise.all(promises).then (data) ->
-      element = React.createElement(RoutingContext, renderProps)
+      props = assign {}, renderProps, {store}
+      element = React.createElement(RoutingContext, props)
       html = renderToString(element)
       res.send(html)
 

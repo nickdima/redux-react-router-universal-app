@@ -2,10 +2,8 @@ React = require 'react'
 { RoutingContext } = require 'react-router'
 { Provider } = require 'react-redux'
 
-store = require './store'
-
 Router = (props) ->
-  <Provider store={store}>
+  <Provider store={props.store}>
     <RoutingContext {...props} />
   </Provider>
 
