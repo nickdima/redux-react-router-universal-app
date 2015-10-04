@@ -18,12 +18,17 @@ styles =
   location:
     color: '#666'
 
-User = ({user}) ->
-  <div style={styles.user}>
-    <img style={styles.avatar} src={user.avatar_url} />
-    <p style={styles.name}>{user.name}</p>
-    <p style={styles.location}>{user.location}</p>
-  </div>
+class User extends React.Component
+  componentWillReceiveProps: (nextProps) ->
+    # console.log 'componentWillReceiveProps', nextProps
+
+  render: ->
+    {user} = @props
+    <div style={styles.user}>
+      <img style={styles.avatar} src={user.avatar_url} />
+      <p style={styles.name}>{user.name}</p>
+      <p style={styles.location}>{user.location}</p>
+    </div>
 
 mapStateToProps = (state) -> user: state.user
 mapDispatchToProps = (dispatch) -> {}

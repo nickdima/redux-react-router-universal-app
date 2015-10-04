@@ -6,7 +6,7 @@ App = require './screens/app'
 User = require './screens/user'
 
 Routes =
-  <Route path="/" component={App} action={actions.getContribs}>
+  <Route path="/" component={App} action={actions.getContribs} >
     <Route path="user/:name" component={User} action={actions.getUser} />
   </Route>
 

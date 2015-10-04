@@ -1,5 +1,6 @@
 React = require 'react'
 { connect } = require 'react-redux'
+{ Link } = require 'react-router'
 assign = require 'object-assign'
 
 styles =
@@ -9,13 +10,16 @@ styles =
     float: 'left'
     marginRight: 100
 
-App = ({contribs, children}) ->
+App = (props) ->
+  {contribs, children} = props
   <div style={styles.app}>
     <div style={styles.list}>
       {
         for contrib in contribs
           <p key={contrib.id}>
-            <a href={'/user/' + contrib.login}>{contrib.login}</a>
+            <Link to={'/user/' + contrib.login}>
+              {contrib.login}
+            </Link>
           </p>
       }
     </div>

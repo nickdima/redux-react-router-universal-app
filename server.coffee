@@ -7,11 +7,17 @@ React = require 'react'
 Promise = require 'bluebird'
 assign = require 'object-assign'
 
-RoutingContext = require './routing-context'
+{ RoutingContext } = require './router'
 routes = require './routes'
 {createStore} = require './store'
+appTemplate = require './templates/app'
 
 app = express()
+
+if process.env.NODE_ENV is 'development'
+  webpack = require 'webpack'
+  compiler = webpack require './webpack.config.coffee'
+  app.use require('webpack-dev-middleware')(compiler, {})
 
 hasAction = (route) -> route.action?
 
@@ -28,7 +34,8 @@ app.get '*', (req, res) ->
       props = assign {}, renderProps, {store}
       element = React.createElement(RoutingContext, props)
       html = renderToString(element)
-      res.send(html)
+      app = appTemplate(html, store.getState())
+      res.send(app)
 
 server = app.listen 9001, ->
   host = server.address().address

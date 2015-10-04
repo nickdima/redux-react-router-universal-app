@@ -1,5 +1,5 @@
-fetch = require 'node-fetch'
-fetch.Promise = require 'bluebird'
+global.Promise = require 'bluebird'
+fetch = require 'isomorphic-fetch'
 { createAction } = require 'redux-actions'
 
 module.exports =
