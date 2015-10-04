@@ -1,6 +1,7 @@
-# Redux & React Router server rendering
+# Redux & React Router universal app
 
-A simple example for doing data fetching and server side rendering with React Router and Redux
+A simple example for doing data fetching and rendering in a universal
+(aka isomorphic) app with React Router and Redux.
 
 ### Setup
 
@@ -14,15 +15,16 @@ npm start
 ### Description
 
 The example uses the GitHub API for demonstrating how async Redux
-actions can work together with React Router server side rendering.
+actions can work together with React Router server side and client
+rendering.  
 For the sake of simplicity it's also using
 [redux-actions](https://github.com/acdlite/redux-actions) and
 [redux-promise](https://github.com/acdlite/redux-promise).
 
-The most important aspects of this approach are these:
+These are the most important aspects of this approach:
 
-- setting redux actions for data fetching as props on the routes, as
-seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/routes.cjsx#L9):
+- **universal**: setting redux actions for data fetching as props on
+the routes, as seen [here](https://github.com/nickdima/redux-react-router-universal-app/blob/master/routes.cjsx):
 
 ```coffee
 <Route path="/" component={App} action={actions.getContribs}>
@@ -30,7 +32,9 @@ seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/ro
 </Route>
 ```
 
-- collecting all actions, dispatching them and waiting for all of them to settle before rendering the matched route server side, as seen [here](https://github.com/nickdima/redux-react-router-server/blob/master/index.coffee#L23):
+- **server**: collecting all actions, dispatching them and waiting
+for all of them to settle before rendering the matched route server
+side, as seen [here](https://github.com/nickdima/redux-react-router-universal-app/blob/master/server.coffee):
 
 ```coffee
 promises = renderProps.routes.filter(hasAction).map (route) ->
@@ -41,10 +45,31 @@ Promise.all(promises).then (data) ->
   props = assign {}, renderProps, {store}
   element = React.createElement(RoutingContext, props)
   html = renderToString(element)
-  res.send(html)
+  app = appTemplate(html, store.getState())
+  res.send(app)
+```
+
+- **client**: dispatching a route's action when entering it by setting
+the `onEnter` prop on every route that has an `action` prop, as seen [here](https://github.com/nickdima/redux-react-router-universal-app/blob/master/router.cjsx):
+
+```coffee
+createRoutes: (routes, store, currentPathname) ->
+  onRouteEnter = ({location: {pathname}, params}) ->
+    if pathname isnt currentPathname
+      store.dispatch @action.call(this, params)
+    currentPathname = pathname
+
+  createRoutes(routes).map set = (route) ->
+    newRoute = assign({}, route)
+    {action, onEnter, childRoutes} = newRoute
+    if action? and not onEnter?
+      newRoute.onEnter = onRouteEnter
+    if childRoutes?
+      newRoute.childRoutes = childRoutes.map(set)
+    newRoute
 ```
 
 ### Troubleshooting
 
-- if data is not loading anymore it's possible you exceeded GitHub's API rate
-limit of 60 calls/hour
+- if data is not loading anymore it's possible you exceeded GitHub's
+API rate limit of 60 calls/hour

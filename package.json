@@ -1,7 +1,7 @@
 {
-  "name": "redux-react-router-server",
+  "name": "redux-react-router-universal-app",
   "version": "1.0.0",
-  "description": "A simple example for doing data fetching and server side rendering with React Router and Redux",
+  "description": "A simple example for doing data fetching and rendering in a universal (aka isomorphic) app with React Router and Redux.",
   "main": "server.coffee",
   "browser": "client.coffee",
   "scripts": {
