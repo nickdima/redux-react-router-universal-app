@@ -1,6 +1,7 @@
 React = require 'react'
 { Router, RoutingContext, createRoutes } = require 'react-router'
 { Provider } = require 'react-redux'
+Promise = require 'bluebird'
 assign = require 'object-assign'
 
 module.exports =
@@ -15,16 +16,18 @@ module.exports =
     </Provider>
 
   createRoutes: (routes, store, currentPathname) ->
-    onRouteEnter = ({location: {pathname}, params}) ->
+    dispatchAction = ({location: {pathname}, params}) ->
       if pathname isnt currentPathname
         store.dispatch @action.call(this, params)
       currentPathname = pathname
 
     createRoutes(routes).map set = (route) ->
-      newRoute = assign({}, route)
-      {action, onEnter, childRoutes} = newRoute
-      if action? and not onEnter?
-        newRoute.onEnter = onRouteEnter
-      if childRoutes?
-        newRoute.childRoutes = childRoutes.map(set)
-      newRoute
+      {action, onEnter, childRoutes} = route
+      onEnter ?= dispatchAction if action?
+      childRoutes = childRoutes?.map(set)
+      assign {}, route, {onEnter, childRoutes}
+
+  dispatchRouteActions: ({routes, params}, store) ->
+    actions = for route in routes when route.action?
+      store.dispatch route.action.call(this, params)
+    Promise.all(actions)

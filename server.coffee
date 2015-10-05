@@ -4,10 +4,9 @@ createLocation = require 'history/lib/createLocation'
 React = require 'react'
 { renderToString } = require 'react-dom/server'
 { match } = require 'react-router'
-Promise = require 'bluebird'
 assign = require 'object-assign'
 
-{ RoutingContext } = require './router'
+{ RoutingContext, dispatchRouteActions } = require './router'
 routes = require './routes'
 {createStore} = require './store'
 appTemplate = require './templates/app'
@@ -19,18 +18,12 @@ if process.env.NODE_ENV is 'development'
   compiler = webpack require './webpack.config.coffee'
   app.use require('webpack-dev-middleware')(compiler, {})
 
-hasAction = (route) -> route.action?
-
 app.get '*', (req, res) ->
   location = createLocation(req.url)
   match { routes, location }, (error, redirectLocation, renderProps) ->
     # no error handling implemented
     store = createStore()
-    promises = renderProps.routes.filter(hasAction).map (route) ->
-      action = route.action.call(this, renderProps.params)
-      store.dispatch(action)
-
-    Promise.all(promises).then (data) ->
+    dispatchRouteActions(renderProps, store).then ->
       props = assign {}, renderProps, {store}
       element = React.createElement(RoutingContext, props)
       html = renderToString(element)
