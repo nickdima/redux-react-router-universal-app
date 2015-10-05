@@ -34,14 +34,17 @@ the routes, as seen [here](https://github.com/nickdima/redux-react-router-univer
 
 - **server**: collecting all actions, dispatching them and waiting
 for all of them to settle before rendering the matched route server
-side, as seen [here](https://github.com/nickdima/redux-react-router-universal-app/blob/master/server.coffee):
+side, as seen [here](https://github.com/nickdima/redux-react-router-universal-app/blob/master/router.cjsx):
 
 ```coffee
-promises = renderProps.routes.filter(hasAction).map (route) ->
-  action = route.action.call(this, renderProps.params)
-  store.dispatch(action)
+dispatchRouteActions: ({routes, params}, store) ->
+  actions = for route in routes when route.action?
+    store.dispatch route.action.call(this, params)
+  Promise.all(actions)
 
-Promise.all(promises).then (data) ->
+...
+
+dispatchRouteActions(renderProps, store).then ->
   props = assign {}, renderProps, {store}
   element = React.createElement(RoutingContext, props)
   html = renderToString(element)
