@@ -70,6 +70,10 @@ createRoutes: (routes, store, currentPathname) ->
     if childRoutes?
       newRoute.childRoutes = childRoutes.map(set)
     newRoute
+
+...
+
+routes =  createRoutes(routes, store, document.location.pathname)
 ```
 
 ### Troubleshooting
