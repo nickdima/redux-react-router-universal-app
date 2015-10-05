@@ -22,6 +22,7 @@ app.get '*', (req, res) ->
   location = createLocation(req.url)
   match { routes, location }, (error, redirectLocation, renderProps) ->
     # no error handling implemented
+    return res.send('') if not renderProps?
     store = createStore()
     dispatchRouteActions(renderProps, store).then ->
       props = assign {}, renderProps, {store}

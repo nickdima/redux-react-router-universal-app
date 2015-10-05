@@ -1,18 +1,12 @@
-{ combineReducers, createStore, applyMiddleware } = require 'redux'
+{ combineReducers, compose, createStore, applyMiddleware } = require 'redux'
 promiseMiddleware = require 'redux-promise'
-createLogger = require 'redux-logger';
-
+createLogger = require 'redux-logger'
 reducers = require './reducers'
-
-logger = createLogger
-  predicate: -> typeof window isnt 'undefined'
-  logger: console if typeof window is 'undefined'
 
 module.exports =
   createStore: (initialState = {}) ->
-    createStoreWithMiddleware = applyMiddleware(
-      promiseMiddleware
-      logger
-    )(createStore)
+    middleware = [promiseMiddleware]
+    middleware.push(createLogger()) if window?
+    storeEnhancer = applyMiddleware.apply(this, middleware)
     reducer = combineReducers(reducers)
-    createStoreWithMiddleware(reducer, initialState)
+    storeEnhancer(createStore)(reducer, initialState)
