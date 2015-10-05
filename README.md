@@ -57,19 +57,16 @@ the `onEnter` prop on every route that has an `action` prop, as seen [here](http
 
 ```coffee
 createRoutes: (routes, store, currentPathname) ->
-  onRouteEnter = ({location: {pathname}, params}) ->
+  dispatchAction = ({location: {pathname}, params}) ->
     if pathname isnt currentPathname
       store.dispatch @action.call(this, params)
     currentPathname = pathname
 
   createRoutes(routes).map set = (route) ->
-    newRoute = assign({}, route)
-    {action, onEnter, childRoutes} = newRoute
-    if action? and not onEnter?
-      newRoute.onEnter = onRouteEnter
-    if childRoutes?
-      newRoute.childRoutes = childRoutes.map(set)
-    newRoute
+    {action, onEnter, childRoutes} = route
+    onEnter ?= dispatchAction if action?
+    childRoutes = childRoutes?.map(set)
+    assign {}, route, {onEnter, childRoutes}
 
 ...
 
